@@ -33,7 +33,8 @@ func main() {
 	employeeSalaryHandler := helpers.NewBuildEmployeeSalary(db)
 	companyBudgetHandler := helpers.NewBuildCompanyBudget(db)
 	workingHourHandler := helpers.NewBuildWorkingHour(db)
+	auth := helpers.NewBuildAuth(db)
 
-	routes.NewRoute(userHandler, companyHandler, employeeHandler, employeeSalaryHandler, companyBudgetHandler, workingHourHandler)
+	routes.NewRoute(userHandler, companyHandler, employeeHandler, employeeSalaryHandler, companyBudgetHandler, workingHourHandler, auth)
 
 }

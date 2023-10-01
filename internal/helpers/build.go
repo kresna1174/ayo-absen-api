@@ -49,3 +49,10 @@ func NewBuildWorkingHour(db *gorm.DB) *handlers.WorkingHourHandler {
 	workingHourHandler := handlers.NewWorkingHourHandler(workingHourService)
 	return workingHourHandler
 }
+
+func NewBuildAuth(db *gorm.DB) *handlers.AuthHandler {
+	authRepository := repositories.NewAuthRepository(db)
+	authService := services.NewAuthService(authRepository)
+	authHandler := handlers.NewAuthHandler(authService)
+	return authHandler
+}
