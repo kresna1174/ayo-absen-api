@@ -8,8 +8,8 @@ import (
 )
 
 type EmployeeServiceInterface interface {
-	GetAll() ([]models.Employee, error)
-	FindById(Id int) (models.Employee, error)
+	GetAll() ([]models.EmployeeWithCompany, error)
+	FindById(Id int) (models.EmployeeWithCompany, error)
 	CreateEmployee(employee request.EmployeeRequest) (models.Employee, error)
 	UpdateEmployee(Id int, employee request.EmployeeUpdateRequest) (models.Employee, error)
 	DeleteEmployee(Id int) (bool, error)
@@ -23,11 +23,11 @@ func NewEmployeeService(repository repositories.EmployeeRepositoryInterafce) *em
 	return &employeeService{repository}
 }
 
-func (service *employeeService) GetAll() ([]models.Employee, error) {
+func (service *employeeService) GetAll() ([]models.EmployeeWithCompany, error) {
 	return service.employeRepository.GetAll()
 }
 
-func (service *employeeService) FindById(Id int) (models.Employee, error) {
+func (service *employeeService) FindById(Id int) (models.EmployeeWithCompany, error) {
 	return service.employeRepository.FindById(Id)
 }
 

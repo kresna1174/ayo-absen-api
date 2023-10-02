@@ -52,7 +52,7 @@ func (handler *EmployeeHandler) GetAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "berhasil mendapatkan data",
-		"data":    resultsResponse,
+		"data":    result,
 	})
 }
 
@@ -75,21 +75,21 @@ func (handler *EmployeeHandler) FindById(ctx *gin.Context) {
 		})
 		return
 	}
-	resultResponse := response.EmployeeResponse{
-		Id:        result.Id,
-		CompanyId: result.CompanyId,
-		Start:     result.Start,
-		End:       result.End,
-		Active:    result.Active,
-		CreatedAt: result.CreatedAt,
-		CreatedBy: result.CreatedBy,
-		UpdatedAt: result.UpdatedAt,
-		UpdatedBy: result.UpdatedBy,
-	}
+	// resultResponse := response.EmployeeResponse{
+	// 	Id:        result.Id,
+	// 	CompanyId: result.CompanyId,
+	// 	Start:     result.Start,
+	// 	End:       result.End,
+	// 	Active:    result.Active,
+	// 	CreatedAt: result.CreatedAt,
+	// 	CreatedBy: result.CreatedBy,
+	// 	UpdatedAt: result.UpdatedAt,
+	// 	UpdatedBy: result.UpdatedBy,
+	// }
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "berhasil mendapatkan data",
-		"data":    resultResponse,
+		"data":    result,
 	})
 }
 
