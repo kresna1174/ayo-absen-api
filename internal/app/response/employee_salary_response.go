@@ -1,8 +1,15 @@
 package response
 
+import "time"
+
 type EmployeeSalaryResponse struct {
-	CompanyId  int    `json:"company_id" binding:"required"`
-	EmployeeId int    `json:"employee_id" binding:"required"`
-	Salary     int    `json:"salary" binding:"required"`
-	PayPeriod  string `json:"pay_period" binding:"required"`
+	Id         int       `json:"id"`
+	CompanyId  int       `json:"company_id"`
+	EmployeeId int       `json:"employee_id"`
+	Salary     int       `json:"salary"`
+	PayPeriod  string    `json:"pay_period"`
+	CreatedAt  time.Time `json:"created_at"`
+	CreatedBy  string    `json:"created_by"`
+	UpdatedAt  time.Time `json:"updated_at"`
+	UpdatedBy  string    `json:"updated_by"`
 }

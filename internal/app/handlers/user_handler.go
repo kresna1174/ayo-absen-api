@@ -1,15 +1,18 @@
 package handlers
 
 import (
+	"api-ayo-absen/internal/app/models"
 	"api-ayo-absen/internal/app/request"
 	"api-ayo-absen/internal/app/response"
 	"api-ayo-absen/internal/app/services"
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserHandler struct {
@@ -30,11 +33,15 @@ func (handler *UserHandler) HandleRootUrl(ctx *gin.Context) {
 
 	for _, r := range result {
 		resultResponse := response.UserResponse{
-			Id:       r.Id,
-			Username: r.Username,
-			Name:     r.Name,
-			Email:    r.Email,
-			Active:   r.Active,
+			Id:        r.Id,
+			Username:  r.Username,
+			Name:      r.Name,
+			Email:     r.Email,
+			Active:    r.Active,
+			CreatedAt: r.CreatedAt,
+			CreatedBy: r.CreatedBy,
+			UpdatedAt: r.UpdatedAt,
+			UpdatedBy: r.UpdatedBy,
 		}
 		resultsResponse = append(resultsResponse, resultResponse)
 	}
@@ -55,11 +62,15 @@ func (handler *UserHandler) HandleFindById(ctx *gin.Context) {
 	var resultsResponse response.UserResponse
 	if result.Id != 0 {
 		resultsResponse = response.UserResponse{
-			Id:       result.Id,
-			Username: result.Username,
-			Name:     result.Name,
-			Email:    result.Email,
-			Active:   result.Active,
+			Id:        result.Id,
+			Username:  result.Username,
+			Name:      result.Name,
+			Email:     result.Email,
+			Active:    result.Active,
+			CreatedAt: result.CreatedAt,
+			CreatedBy: result.CreatedBy,
+			UpdatedAt: result.UpdatedAt,
+			UpdatedBy: result.UpdatedBy,
 		}
 		ctx.JSON(http.StatusOK, gin.H{
 			"status": "success",
@@ -74,7 +85,10 @@ func (handler *UserHandler) HandleFindById(ctx *gin.Context) {
 }
 
 func (handler *UserHandler) HandleCreate(ctx *gin.Context) {
+	userSession := ctx.MustGet("user").(models.Users)
 	var userRequest request.UserRequest
+	userRequest.CreatedAt = time.Now()
+	userRequest.CreatedBy = userSession.Username
 	err := ctx.ShouldBindJSON(&userRequest)
 	if err != nil {
 		errorMessages := []string{}
@@ -89,6 +103,16 @@ func (handler *UserHandler) HandleCreate(ctx *gin.Context) {
 		return
 	}
 
+	hash, err := bcrypt.GenerateFromPassword([]byte(userRequest.Password), 10)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"message": "failed to hash password",
+		})
+		return
+	}
+
+	userRequest.Password = string(hash)
+
 	result, er := handler.service.CreateUser(userRequest)
 	if er != nil {
 		ctx.JSON(http.StatusOK, gin.H{
@@ -100,10 +124,15 @@ func (handler *UserHandler) HandleCreate(ctx *gin.Context) {
 	}
 
 	userResponse := response.UserResponse{
-		Id:       result.Id,
-		Username: result.Username,
-		Email:    result.Email,
-		Active:   result.Active,
+		Id:        result.Id,
+		Username:  result.Username,
+		Name:      result.Name,
+		Email:     result.Email,
+		Active:    result.Active,
+		CreatedAt: result.CreatedAt,
+		CreatedBy: result.CreatedBy,
+		UpdatedAt: result.UpdatedAt,
+		UpdatedBy: result.UpdatedBy,
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -116,7 +145,10 @@ func (handle *UserHandler) HandleUpdate(ctx *gin.Context) {
 	ids := ctx.Param("id")
 	id, _ := strconv.Atoi(ids)
 
-	var userRequest request.UserRequest
+	userSession := ctx.MustGet("user").(models.Users)
+	var userRequest request.UserUpdateRequest
+	userRequest.UpdatedAt = time.Now()
+	userRequest.UpdatedBy = userSession.Username
 	err := ctx.ShouldBindJSON(&userRequest)
 
 	if err != nil {
@@ -133,7 +165,19 @@ func (handle *UserHandler) HandleUpdate(ctx *gin.Context) {
 		return
 	}
 
-	response, e := handle.service.UpdateUser(id, userRequest)
+	if userRequest.Password != "" {
+		hash, err := bcrypt.GenerateFromPassword([]byte(userRequest.Password), 10)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"message": "failed to hash password",
+			})
+			return
+		}
+
+		userRequest.Password = string(hash)
+	}
+
+	res, e := handle.service.UpdateUser(id, userRequest)
 	if e != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -143,10 +187,22 @@ func (handle *UserHandler) HandleUpdate(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusBadRequest, gin.H{
+	userResponse := response.UserResponse{
+		Id:        res.Id,
+		Username:  res.Username,
+		Name:      res.Name,
+		Email:     res.Email,
+		Active:    res.Active,
+		CreatedAt: res.CreatedAt,
+		CreatedBy: res.CreatedBy,
+		UpdatedAt: res.UpdatedAt,
+		UpdatedBy: res.UpdatedBy,
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Berhasil Update Data",
-		"errors":  response,
+		"errors":  userResponse,
 	})
 }
 

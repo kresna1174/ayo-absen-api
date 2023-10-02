@@ -5,74 +5,76 @@ import (
 	"api-ayo-absen/internal/app/repositories"
 	"api-ayo-absen/internal/app/request"
 	"errors"
-	"time"
 )
 
-type CompanyBudgetServiceInterface interface {
-	GetAll() ([]models.CompanyBudget, error)
-	FindById(Id int) (models.CompanyBudget, error)
-	Create(budgetRequest request.CompanyBudgetRequest) (models.CompanyBudget, error)
-	Update(Id int, companyBudget request.CompanyBudgetRequest) (models.CompanyBudget, error)
+type WorkingHoursServiceInterface interface {
+	GetAll() ([]models.WorkingHours, error)
+	FindById(Id int) (models.WorkingHours, error)
+	Create(workingHours request.WorkingHoursRequest) (models.WorkingHours, error)
+	Update(Id int, workingHours request.WorkingHoursUpdateRequest) (models.WorkingHours, error)
 	Delete(Id int) (bool, error)
 }
 
-type companyBudgetService struct {
-	companyBudgetRepository repositories.CompanyBudgetRepositoryInterface
+type workingHourService struct {
+	workingHourRepository repositories.WorkingHoursRepositoryInterface
 }
 
-func NewCompanyBudgetService(companyBudgetRepository repositories.CompanyBudgetRepositoryInterface) *companyBudgetService {
-	return &companyBudgetService{companyBudgetRepository}
+func NewWorkingHourService(workingHoursRepositoryInterface repositories.WorkingHoursRepositoryInterface) *workingHourService {
+	return &workingHourService{workingHoursRepositoryInterface}
 }
 
-func (s *companyBudgetService) GetAll() ([]models.CompanyBudget, error) {
-	result, err := s.companyBudgetRepository.GetAll()
+func (s *workingHourService) GetAll() ([]models.WorkingHours, error) {
+	result, err := s.workingHourRepository.GetAll()
 
 	return result, err
 }
 
-func (s *companyBudgetService) FindById(Id int) (models.CompanyBudget, error) {
-	result, err := s.companyBudgetRepository.FindById(Id)
+func (s *workingHourService) FindById(Id int) (models.WorkingHours, error) {
+	result, err := s.workingHourRepository.FindById(Id)
 
 	return result, err
 }
 
-func (s *companyBudgetService) Create(companyBudget request.CompanyBudgetRequest) (models.CompanyBudget, error) {
-	dataCompanyBudget := models.CompanyBudget{
-		CompanyId: companyBudget.CompanyId,
-		Budget:    companyBudget.Budget,
-		Active:    companyBudget.Active,
-		CreatedAt: time.Now(),
-		CreatedBy: "system",
-		UpdatedAt: time.Now(),
-		UpdatedBy: "system",
+func (s *workingHourService) Create(workingHours request.WorkingHoursRequest) (models.WorkingHours, error) {
+	workingHour := models.WorkingHours{
+		CompanyId: workingHours.CompanyId,
+		StartDay:  workingHours.StartDay,
+		EndDay:    workingHours.EndDay,
+		StartTime: workingHours.StartTime,
+		EndTime:   workingHours.EndTime,
+		Active:    workingHours.Active,
+		CreatedAt: workingHours.CreatedAt,
+		CreatedBy: workingHours.CreatedBy,
+		UpdatedAt: workingHours.CreatedAt,
 	}
-	result, err := s.companyBudgetRepository.Create(dataCompanyBudget)
+	result, err := s.workingHourRepository.Create(workingHour)
 
 	return result, err
 }
 
-func (s *companyBudgetService) Update(Id int, companyBudget request.CompanyBudgetRequest) (models.CompanyBudget, error) {
-	findCompanyBudget, err := s.companyBudgetRepository.FindById(Id)
+func (s *workingHourService) Update(Id int, workingHours request.WorkingHoursUpdateRequest) (models.WorkingHours, error) {
+	findWorkingHour, err := s.workingHourRepository.FindById(Id)
 	if err != nil {
-		return models.CompanyBudget{}, errors.New("Data tidak ditemukan")
+		return models.WorkingHours{}, errors.New("Data tidak ditemukan")
 	}
-	dataCompanyBudget := models.CompanyBudget{
-		Id:        findCompanyBudget.Id,
-		CompanyId: companyBudget.CompanyId,
-		Budget:    companyBudget.Budget,
-		Active:    companyBudget.Active,
-		CreatedAt: findCompanyBudget.CreatedAt,
-		CreatedBy: findCompanyBudget.CreatedBy,
-		UpdatedAt: time.Now(),
-		UpdatedBy: "system",
+	workingHour := models.WorkingHours{
+		Id:        findWorkingHour.Id,
+		CompanyId: workingHours.CompanyId,
+		StartDay:  workingHours.StartDay,
+		EndDay:    workingHours.EndDay,
+		StartTime: workingHours.StartTime,
+		EndTime:   workingHours.EndTime,
+		Active:    workingHours.Active,
+		UpdatedAt: workingHours.UpdatedAt,
+		UpdatedBy: workingHours.UpdatedBy,
 	}
-	return s.companyBudgetRepository.Update(dataCompanyBudget)
+	return s.workingHourRepository.Update(workingHour)
 }
 
-func (s *companyBudgetService) Delete(Id int) (bool, error) {
-	findCompanyBudget, err := s.companyBudgetRepository.FindById(Id)
+func (s *workingHourService) Delete(Id int) (bool, error) {
+	findWorkingHour, err := s.workingHourRepository.FindById(Id)
 	if err != nil {
 		return false, errors.New("Data tidak ditemukan")
 	}
-	return s.companyBudgetRepository.Delete(findCompanyBudget)
+	return s.workingHourRepository.Delete(findWorkingHour)
 }

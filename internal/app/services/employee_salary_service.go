@@ -5,14 +5,13 @@ import (
 	"api-ayo-absen/internal/app/repositories"
 	"api-ayo-absen/internal/app/request"
 	"errors"
-	"time"
 )
 
 type EmployeeSalaryServiceInterface interface {
 	GetAll() ([]models.EmployeeSalaries, error)
 	FindById(Id int) (models.EmployeeSalaries, error)
 	Create(employeeSalary request.EmployeeSalaryRequest) (models.EmployeeSalaries, error)
-	Update(Id int, employeeSalary request.EmployeeSalaryRequest) (models.EmployeeSalaries, error)
+	Update(Id int, employeeSalary request.EmployeeSalaryUpdateRequest) (models.EmployeeSalaries, error)
 	Delete(Id int) (bool, error)
 }
 
@@ -38,15 +37,14 @@ func (service *employeeSalaryService) Create(employeeSalary request.EmployeeSala
 		EmployeeId: employeeSalary.EmployeeId,
 		Salary:     employeeSalary.Salary,
 		PayPeriod:  employeeSalary.PayPeriod,
-		Created_at: time.Now(),
-		Created_by: "system",
-		Updated_at: time.Now(),
-		Updated_by: "system",
+		Created_at: employeeSalary.CreatedAt,
+		Created_by: employeeSalary.CreatedBy,
+		Updated_at: employeeSalary.CreatedAt,
 	}
 	return service.employeeRepositoryInterface.Create(employeeSalaryEntity)
 }
 
-func (service *employeeSalaryService) Update(Id int, employee request.EmployeeSalaryRequest) (models.EmployeeSalaries, error) {
+func (service *employeeSalaryService) Update(Id int, employee request.EmployeeSalaryUpdateRequest) (models.EmployeeSalaries, error) {
 	findEmployeeSalary, err := service.employeeRepositoryInterface.FindById(Id)
 	if err != nil {
 		return models.EmployeeSalaries{}, errors.New("Data tidak ditemukan")
@@ -58,10 +56,8 @@ func (service *employeeSalaryService) Update(Id int, employee request.EmployeeSa
 		EmployeeId: employee.EmployeeId,
 		Salary:     employee.Salary,
 		PayPeriod:  employee.PayPeriod,
-		Created_at: findEmployeeSalary.Created_at,
-		Created_by: findEmployeeSalary.Created_by,
-		Updated_at: time.Now(),
-		Updated_by: "system",
+		Updated_at: employee.UpdatedAt,
+		Updated_by: employee.UpdatedBy,
 	}
 	return service.employeeRepositoryInterface.Update(employeeSalaryEntity)
 }

@@ -50,6 +50,7 @@ func AuthRequire(c *gin.Context) {
 
 		var users models.Users
 		db.Find(&users, claims["sub"])
+		c.Set("user", users)
 
 		if users.Id == 0 {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
@@ -59,7 +60,6 @@ func AuthRequire(c *gin.Context) {
 		}
 		return
 
-		c.Set("user", users)
 		c.Next()
 
 	} else {

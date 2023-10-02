@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"api-ayo-absen/internal/app/models"
 	"api-ayo-absen/internal/app/request"
 	response2 "api-ayo-absen/internal/app/response"
 	"api-ayo-absen/internal/app/services"
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -35,10 +37,15 @@ func (handler *EmployeeSalaryHandler) GetAll(ctx *gin.Context) {
 
 	for _, res := range response {
 		employeeSalaryResponse := response2.EmployeeSalaryResponse{
+			Id:         res.Id,
 			CompanyId:  res.CompanyId,
 			EmployeeId: res.EmployeeId,
 			Salary:     res.Salary,
 			PayPeriod:  res.PayPeriod,
+			CreatedAt:  res.Created_at,
+			CreatedBy:  res.Created_by,
+			UpdatedAt:  res.Updated_at,
+			UpdatedBy:  res.Updated_by,
 		}
 		employeeSalaryResponses = append(employeeSalaryResponses, employeeSalaryResponse)
 	}
@@ -62,20 +69,25 @@ func (handler *EmployeeSalaryHandler) FindById(ctx *gin.Context) {
 		})
 		return
 	}
+
 	if response.Id == 0 {
-		ctx.JSON(http.StatusOK, gin.H{
+		ctx.JSON(http.StatusNotFound, gin.H{
 			"success": false,
 			"message": "data tidak ditemukan",
-			"data":    response,
 		})
 		return
 	}
 
 	employeeSalaryResponse := response2.EmployeeSalaryResponse{
+		Id:         response.Id,
 		CompanyId:  response.CompanyId,
 		EmployeeId: response.EmployeeId,
 		Salary:     response.Salary,
 		PayPeriod:  response.PayPeriod,
+		CreatedAt:  response.Created_at,
+		CreatedBy:  response.Created_by,
+		UpdatedAt:  response.Updated_at,
+		UpdatedBy:  response.Updated_by,
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -86,7 +98,10 @@ func (handler *EmployeeSalaryHandler) FindById(ctx *gin.Context) {
 }
 
 func (handler *EmployeeSalaryHandler) Create(ctx *gin.Context) {
+	userSession := ctx.MustGet("user").(models.Users)
 	var employeeSalaryRequest request.EmployeeSalaryRequest
+	employeeSalaryRequest.CreatedAt = time.Now()
+	employeeSalaryRequest.CreatedBy = userSession.Username
 	err := ctx.ShouldBindJSON(&employeeSalaryRequest)
 
 	if err != nil {
@@ -113,10 +128,15 @@ func (handler *EmployeeSalaryHandler) Create(ctx *gin.Context) {
 	}
 
 	employeeSalaryResponse := response2.EmployeeSalaryResponse{
+		Id:         response.Id,
 		CompanyId:  response.CompanyId,
 		EmployeeId: response.EmployeeId,
 		Salary:     response.Salary,
 		PayPeriod:  response.PayPeriod,
+		CreatedAt:  response.Created_at,
+		CreatedBy:  response.Created_by,
+		UpdatedAt:  response.Updated_at,
+		UpdatedBy:  response.Updated_by,
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -129,7 +149,10 @@ func (handler *EmployeeSalaryHandler) Create(ctx *gin.Context) {
 func (handler *EmployeeSalaryHandler) Update(ctx *gin.Context) {
 	ids := ctx.Param("id")
 	id, _ := strconv.Atoi(ids)
-	var employeeSalaryRequest request.EmployeeSalaryRequest
+	userSession := ctx.MustGet("user").(models.Users)
+	var employeeSalaryRequest request.EmployeeSalaryUpdateRequest
+	employeeSalaryRequest.UpdatedAt = time.Now()
+	employeeSalaryRequest.UpdatedBy = userSession.Username
 	err := ctx.ShouldBindJSON(&employeeSalaryRequest)
 
 	if err != nil {
@@ -156,10 +179,15 @@ func (handler *EmployeeSalaryHandler) Update(ctx *gin.Context) {
 	}
 
 	employeeSalaryResponse := response2.EmployeeSalaryResponse{
+		Id:         response.Id,
 		CompanyId:  response.CompanyId,
 		EmployeeId: response.EmployeeId,
 		Salary:     response.Salary,
 		PayPeriod:  response.PayPeriod,
+		CreatedAt:  response.Created_at,
+		CreatedBy:  response.Created_by,
+		UpdatedAt:  response.Updated_at,
+		UpdatedBy:  response.Updated_by,
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -172,7 +200,7 @@ func (handler *EmployeeSalaryHandler) Update(ctx *gin.Context) {
 func (handler *EmployeeSalaryHandler) Delete(ctx *gin.Context) {
 	ids := ctx.Param("id")
 	id, _ := strconv.Atoi(ids)
-	response, err := handler.employeeSalaryServiceInterface.Delete(id)
+	_, err := handler.employeeSalaryServiceInterface.Delete(id)
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
 			"success": false,
@@ -185,6 +213,5 @@ func (handler *EmployeeSalaryHandler) Delete(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "berhasil menghapus data",
-		"data":    response,
 	})
 }

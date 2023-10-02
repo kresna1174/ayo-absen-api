@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"api-ayo-absen/internal/app/models"
 	"api-ayo-absen/internal/app/request"
 	"api-ayo-absen/internal/app/response"
 	"api-ayo-absen/internal/app/services"
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -34,10 +36,15 @@ func (handler *EmployeeHandler) GetAll(ctx *gin.Context) {
 	for _, r := range result {
 		resultResponse := response.EmployeeResponse{
 			Id:        r.Id,
+			Name:      r.Name,
 			CompanyId: r.CompanyId,
 			Start:     r.Start,
 			End:       r.End,
 			Active:    r.Active,
+			CreatedAt: r.CreatedAt,
+			CreatedBy: r.CreatedBy,
+			UpdatedAt: r.UpdatedAt,
+			UpdatedBy: r.UpdatedBy,
 		}
 		resultsResponse = append(resultsResponse, resultResponse)
 	}
@@ -59,6 +66,14 @@ func (handler *EmployeeHandler) FindById(ctx *gin.Context) {
 			"message": "Gagal mendapatkan data",
 			"errors":  err.Error(),
 		})
+		return
+	}
+	if result.Id == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": "data tidak ditemukan",
+		})
+		return
 	}
 	resultResponse := response.EmployeeResponse{
 		Id:        result.Id,
@@ -66,6 +81,10 @@ func (handler *EmployeeHandler) FindById(ctx *gin.Context) {
 		Start:     result.Start,
 		End:       result.End,
 		Active:    result.Active,
+		CreatedAt: result.CreatedAt,
+		CreatedBy: result.CreatedBy,
+		UpdatedAt: result.UpdatedAt,
+		UpdatedBy: result.UpdatedBy,
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -75,7 +94,10 @@ func (handler *EmployeeHandler) FindById(ctx *gin.Context) {
 }
 
 func (handler *EmployeeHandler) CreateEmployee(ctx *gin.Context) {
+	userSession := ctx.MustGet("user").(models.Users)
 	var employeeRequest request.EmployeeRequest
+	employeeRequest.CreatedAt = time.Now()
+	employeeRequest.CreatedBy = userSession.Username
 	err := ctx.ShouldBindJSON(&employeeRequest)
 	if err != nil {
 		var errorMessages []string
@@ -103,11 +125,16 @@ func (handler *EmployeeHandler) CreateEmployee(ctx *gin.Context) {
 	}
 
 	employeeResponse := response.EmployeeResponse{
+		Id:        result.Id,
 		CompanyId: result.CompanyId,
 		Name:      result.Name,
 		Start:     result.Start,
 		End:       result.End,
 		Active:    result.Active,
+		CreatedAt: result.CreatedAt,
+		CreatedBy: result.CreatedBy,
+		UpdatedAt: result.UpdatedAt,
+		UpdatedBy: result.UpdatedBy,
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -120,7 +147,10 @@ func (handler *EmployeeHandler) CreateEmployee(ctx *gin.Context) {
 func (handler *EmployeeHandler) UpdateEmployee(ctx *gin.Context) {
 	ids := ctx.Param("id")
 	id, _ := strconv.Atoi(ids)
-	var employeeRequest request.EmployeeRequest
+	userSession := ctx.MustGet("user").(models.Users)
+	var employeeRequest request.EmployeeUpdateRequest
+	employeeRequest.UpdatedAt = time.Now()
+	employeeRequest.UpdatedBy = userSession.Username
 	err := ctx.ShouldBindJSON(&employeeRequest)
 	if err != nil {
 		var errorMessages []string
@@ -148,11 +178,16 @@ func (handler *EmployeeHandler) UpdateEmployee(ctx *gin.Context) {
 	}
 
 	employeeResponse := response.EmployeeResponse{
+		Id:        result.Id,
 		CompanyId: result.CompanyId,
 		Name:      result.Name,
 		Start:     result.Start,
 		End:       result.End,
 		Active:    result.Active,
+		CreatedAt: result.CreatedAt,
+		CreatedBy: result.CreatedBy,
+		UpdatedAt: result.UpdatedAt,
+		UpdatedBy: result.UpdatedBy,
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{

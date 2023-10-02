@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"api-ayo-absen/internal/app/models"
 	"api-ayo-absen/internal/app/request"
 	"api-ayo-absen/internal/app/response"
 	"api-ayo-absen/internal/app/services"
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -40,6 +42,10 @@ func (h *WorkingHourHandler) GetAll(ctx *gin.Context) {
 			StartTime: r.StartTime,
 			EndTime:   r.EndTime,
 			Active:    r.Active,
+			CreatedAt: r.CreatedAt,
+			CreatedBy: r.CreatedBy,
+			UpdatedAt: r.UpdatedAt,
+			UpdatedBy: r.UpdatedBy,
 		}
 		resultsResponse = append(resultsResponse, resultResponse)
 	}
@@ -61,7 +67,17 @@ func (h *WorkingHourHandler) FindById(ctx *gin.Context) {
 			"message": "Gagal mendapatkan data",
 			"errors":  err.Error(),
 		})
+		return
 	}
+
+	if result.Id == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": "data tidak ditemukan",
+		})
+		return
+	}
+
 	resultResponse := response.WorkingHoursResponse{
 		Id:        result.Id,
 		CompanyId: result.CompanyId,
@@ -70,6 +86,10 @@ func (h *WorkingHourHandler) FindById(ctx *gin.Context) {
 		StartTime: result.StartTime,
 		EndTime:   result.EndTime,
 		Active:    result.Active,
+		CreatedAt: result.CreatedAt,
+		CreatedBy: result.CreatedBy,
+		UpdatedAt: result.UpdatedAt,
+		UpdatedBy: result.UpdatedBy,
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -79,7 +99,10 @@ func (h *WorkingHourHandler) FindById(ctx *gin.Context) {
 }
 
 func (h *WorkingHourHandler) Create(ctx *gin.Context) {
+	userSession := ctx.MustGet("user").(models.Users)
 	var workingHoursRequest request.WorkingHoursRequest
+	workingHoursRequest.CreatedAt = time.Now()
+	workingHoursRequest.CreatedBy = userSession.Username
 	err := ctx.ShouldBindJSON(&workingHoursRequest)
 	if err != nil {
 		var errorMessages []string
@@ -114,6 +137,10 @@ func (h *WorkingHourHandler) Create(ctx *gin.Context) {
 		StartTime: result.StartTime,
 		EndTime:   result.EndTime,
 		Active:    result.Active,
+		CreatedAt: result.CreatedAt,
+		CreatedBy: result.CreatedBy,
+		UpdatedAt: result.UpdatedAt,
+		UpdatedBy: result.UpdatedBy,
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -126,7 +153,10 @@ func (h *WorkingHourHandler) Create(ctx *gin.Context) {
 func (h *WorkingHourHandler) Update(ctx *gin.Context) {
 	ids := ctx.Param("id")
 	id, _ := strconv.Atoi(ids)
-	var workingHoursRequest request.WorkingHoursRequest
+	userSession := ctx.MustGet("user").(models.Users)
+	var workingHoursRequest request.WorkingHoursUpdateRequest
+	workingHoursRequest.UpdatedAt = time.Now()
+	workingHoursRequest.UpdatedBy = userSession.Username
 	err := ctx.ShouldBindJSON(&workingHoursRequest)
 	if err != nil {
 		var errorMessages []string
@@ -161,6 +191,10 @@ func (h *WorkingHourHandler) Update(ctx *gin.Context) {
 		StartTime: result.StartTime,
 		EndTime:   result.EndTime,
 		Active:    result.Active,
+		CreatedAt: result.CreatedAt,
+		CreatedBy: result.CreatedBy,
+		UpdatedAt: result.UpdatedAt,
+		UpdatedBy: result.UpdatedBy,
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -173,7 +207,7 @@ func (h *WorkingHourHandler) Update(ctx *gin.Context) {
 func (h *WorkingHourHandler) Delete(ctx *gin.Context) {
 	ids := ctx.Param("id")
 	id, _ := strconv.Atoi(ids)
-	result, err := h.workingHoursServiceInterface.Delete(id)
+	_, err := h.workingHoursServiceInterface.Delete(id)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -185,6 +219,5 @@ func (h *WorkingHourHandler) Delete(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "berhasil menghapus data",
-		"data":    result,
 	})
 }

@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"api-ayo-absen/internal/app/models"
 	"api-ayo-absen/internal/app/request"
 	"api-ayo-absen/internal/app/response"
 	"api-ayo-absen/internal/app/services"
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -26,9 +28,13 @@ func (handler *CompanyHandler) GetAll(ctx *gin.Context) {
 
 	for _, companies := range result {
 		resultResponse := response.CompanyResponse{
-			Id:     companies.Id,
-			Name:   companies.Name,
-			Active: companies.Active,
+			Id:        companies.Id,
+			Name:      companies.Name,
+			Active:    companies.Active,
+			CreatedAt: companies.Created_at,
+			CreatedBy: companies.Created_by,
+			UpdateAt:  companies.Updated_at,
+			UpdatedBy: companies.Updated_by,
 		}
 		resultsResponse = append(resultsResponse, resultResponse)
 	}
@@ -54,9 +60,13 @@ func (handler *CompanyHandler) FindById(ctx *gin.Context) {
 	}
 
 	resultResponse := response.CompanyResponse{
-		Id:     result.Id,
-		Name:   result.Name,
-		Active: result.Active,
+		Id:        result.Id,
+		Name:      result.Name,
+		Active:    result.Active,
+		CreatedAt: result.Created_at,
+		CreatedBy: result.Created_by,
+		UpdateAt:  result.Updated_at,
+		UpdatedBy: result.Updated_by,
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -67,7 +77,10 @@ func (handler *CompanyHandler) FindById(ctx *gin.Context) {
 }
 
 func (handler *CompanyHandler) CreateCompany(ctx *gin.Context) {
+	userSession := ctx.MustGet("user").(models.Users)
 	var companyRequest request.CompanyRequest
+	companyRequest.CreatedAt = time.Now()
+	companyRequest.CreatedBy = userSession.Username
 
 	err := ctx.ShouldBind(&companyRequest)
 	if err != nil {
@@ -95,9 +108,13 @@ func (handler *CompanyHandler) CreateCompany(ctx *gin.Context) {
 	}
 
 	resultResponse := response.CompanyResponse{
-		Id:     result.Id,
-		Name:   result.Name,
-		Active: result.Active,
+		Id:        result.Id,
+		Name:      result.Name,
+		Active:    result.Active,
+		CreatedAt: result.Created_at,
+		CreatedBy: result.Created_by,
+		UpdateAt:  result.Updated_at,
+		UpdatedBy: result.Updated_by,
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": false,
@@ -110,8 +127,10 @@ func (handler *CompanyHandler) CreateCompany(ctx *gin.Context) {
 func (handle *CompanyHandler) UpdateCompany(ctx *gin.Context) {
 	ids := ctx.Param("id")
 	id, _ := strconv.Atoi(ids)
-
-	var companyRequest request.CompanyRequest
+	userSession := ctx.MustGet("user").(models.Users)
+	var companyRequest request.CompanyUpdateRequest
+	companyRequest.UpdatedAt = time.Now()
+	companyRequest.UpdatedBy = userSession.Username
 
 	err := ctx.ShouldBindJSON(&companyRequest)
 
@@ -142,9 +161,13 @@ func (handle *CompanyHandler) UpdateCompany(ctx *gin.Context) {
 	}
 
 	resultResponse := response.CompanyResponse{
-		Id:     result.Id,
-		Name:   result.Name,
-		Active: result.Active,
+		Id:        result.Id,
+		Name:      result.Name,
+		Active:    result.Active,
+		CreatedAt: result.Created_at,
+		CreatedBy: result.Created_by,
+		UpdateAt:  result.Updated_at,
+		UpdatedBy: result.Updated_by,
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{

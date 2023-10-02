@@ -6,8 +6,8 @@ type Employee struct {
 	Id        int
 	CompanyId int
 	Name      string
-	Start     time.Time
-	End       time.Time
+	Start     string
+	End       string
 	Active    int
 	CreatedAt time.Time
 	CreatedBy string

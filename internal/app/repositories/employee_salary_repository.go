@@ -2,6 +2,8 @@ package repositories
 
 import (
 	"api-ayo-absen/internal/app/models"
+	"errors"
+
 	"gorm.io/gorm"
 )
 
@@ -25,7 +27,7 @@ func (r *employeeSalaryRepository) GetAll() ([]models.EmployeeSalaries, error) {
 	var employeeSalaryEntity []models.EmployeeSalaries
 	err := r.db.Find(&employeeSalaryEntity).Error
 	if err != nil {
-
+		return []models.EmployeeSalaries{}, err
 	}
 	return employeeSalaryEntity, err
 }
@@ -35,7 +37,7 @@ func (r *employeeSalaryRepository) FindById(Id int) (models.EmployeeSalaries, er
 	err := r.db.Find(&employeeSalaryEntity, Id).Error
 
 	if err != nil {
-
+		return models.EmployeeSalaries{}, err
 	}
 	return employeeSalaryEntity, err
 }
@@ -44,17 +46,19 @@ func (r *employeeSalaryRepository) Create(employee models.EmployeeSalaries) (mod
 	err := r.db.Create(&employee).Error
 
 	if err != nil {
-
+		return models.EmployeeSalaries{}, err
 	}
 	return employee, err
 }
 
 func (r *employeeSalaryRepository) Update(employee models.EmployeeSalaries) (models.EmployeeSalaries, error) {
-	err := r.db.Save(&employee).Error
-	if err != nil {
-
+	err := r.db.Model(&employee).Updates(&employee).Error
+	var employeeModel models.EmployeeSalaries
+	er := r.db.Find(&employeeModel, employee.Id).Error
+	if er != nil {
+		return models.EmployeeSalaries{}, errors.New("tidak dapat mengembalikan nilai")
 	}
-	return employee, err
+	return employeeModel, err
 }
 
 func (r *employeeSalaryRepository) Delete(employee models.EmployeeSalaries) (bool, error) {

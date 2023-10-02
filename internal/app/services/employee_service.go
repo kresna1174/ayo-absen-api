@@ -5,14 +5,13 @@ import (
 	"api-ayo-absen/internal/app/repositories"
 	"api-ayo-absen/internal/app/request"
 	"errors"
-	"time"
 )
 
 type EmployeeServiceInterface interface {
 	GetAll() ([]models.Employee, error)
 	FindById(Id int) (models.Employee, error)
 	CreateEmployee(employee request.EmployeeRequest) (models.Employee, error)
-	UpdateEmployee(Id int, employee request.EmployeeRequest) (models.Employee, error)
+	UpdateEmployee(Id int, employee request.EmployeeUpdateRequest) (models.Employee, error)
 	DeleteEmployee(Id int) (bool, error)
 }
 
@@ -36,19 +35,18 @@ func (service *employeeService) CreateEmployee(request request.EmployeeRequest) 
 	insertEmployee := models.Employee{
 		CompanyId: request.CompanyId,
 		Name:      request.Name,
-		Start:     time.Now(),
-		End:       time.Now(),
+		Start:     request.Start,
+		End:       request.End,
 		Active:    request.Active,
-		CreatedAt: time.Now(),
-		CreatedBy: "system",
-		UpdatedAt: time.Now(),
-		UpdatedBy: "system",
+		CreatedAt: request.CreatedAt,
+		CreatedBy: request.CreatedBy,
+		UpdatedAt: request.CreatedAt,
 	}
 
 	return service.employeRepository.CreateEmployee(insertEmployee)
 }
 
-func (service *employeeService) UpdateEmployee(Id int, request request.EmployeeRequest) (models.Employee, error) {
+func (service *employeeService) UpdateEmployee(Id int, request request.EmployeeUpdateRequest) (models.Employee, error) {
 	findEmployee, err := service.employeRepository.FindById(Id)
 	if err != nil {
 		return models.Employee{}, errors.New("Data Tidak Ditemukan")
@@ -58,13 +56,11 @@ func (service *employeeService) UpdateEmployee(Id int, request request.EmployeeR
 		Id:        findEmployee.Id,
 		CompanyId: request.CompanyId,
 		Name:      request.Name,
-		Start:     time.Now(),
-		End:       time.Now(),
+		Start:     request.Start,
+		End:       request.End,
 		Active:    request.Active,
-		CreatedAt: findEmployee.CreatedAt,
-		CreatedBy: findEmployee.CreatedBy,
-		UpdatedAt: time.Now(),
-		UpdatedBy: "system",
+		UpdatedAt: request.UpdatedAt,
+		UpdatedBy: request.UpdatedBy,
 	}
 
 	return service.employeRepository.UpdateEmployee(updateEmployee)

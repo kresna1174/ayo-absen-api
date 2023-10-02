@@ -5,14 +5,13 @@ import (
 	"api-ayo-absen/internal/app/repositories"
 	"api-ayo-absen/internal/app/request"
 	"errors"
-	"time"
 )
 
 type CompanyServiceInterface interface {
 	GetAll() ([]models.Companies, error)
 	FindById(Id int) (models.Companies, error)
 	CreateCompany(company request.CompanyRequest) (models.Companies, error)
-	UpdateCompany(Id int, company request.CompanyRequest) (models.Companies, error)
+	UpdateCompany(Id int, company request.CompanyUpdateRequest) (models.Companies, error)
 	DeleteCompany(Id int) (bool, error)
 }
 
@@ -36,15 +35,14 @@ func (service *companyService) CreateCompany(companyRequest request.CompanyReque
 	arr := models.Companies{
 		Name:       companyRequest.Name,
 		Active:     companyRequest.Active,
-		Created_at: time.Now(),
-		Created_by: "System",
-		Updated_at: time.Now(),
-		Updated_by: "System",
+		Created_at: companyRequest.CreatedAt,
+		Created_by: companyRequest.CreatedBy,
+		Updated_at: companyRequest.CreatedAt,
 	}
 	return service.companyRepositoryInterface.CreateCompany(arr)
 }
 
-func (service *companyService) UpdateCompany(Id int, companyRequest request.CompanyRequest) (models.Companies, error) {
+func (service *companyService) UpdateCompany(Id int, companyRequest request.CompanyUpdateRequest) (models.Companies, error) {
 	findCompany, err := service.FindById(Id)
 	if err != nil {
 		panic(err)
@@ -53,10 +51,8 @@ func (service *companyService) UpdateCompany(Id int, companyRequest request.Comp
 		Id:         findCompany.Id,
 		Name:       companyRequest.Name,
 		Active:     companyRequest.Active,
-		Created_at: findCompany.Created_at,
-		Created_by: findCompany.Created_by,
-		Updated_at: time.Now(),
-		Updated_by: "System",
+		Updated_at: companyRequest.UpdatedAt,
+		Updated_by: companyRequest.UpdatedBy,
 	}
 	return service.companyRepositoryInterface.UpdateCompany(arr)
 }

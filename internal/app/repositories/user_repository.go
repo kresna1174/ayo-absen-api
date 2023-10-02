@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"api-ayo-absen/internal/app/models"
+	"errors"
 
 	"gorm.io/gorm"
 )
@@ -45,9 +46,14 @@ func (repository *userRepository) CreateUser(users models.Users) (models.Users, 
 }
 
 func (repository *userRepository) UpdateUser(user models.Users) (models.Users, error) {
-	err := repository.db.Save(&user).Error
+	err := repository.db.Model(&user).Updates(&user).Error
 
-	return user, err
+	var userModel models.Users
+	er := repository.db.Find(&userModel, user.Id).Error
+	if er != nil {
+		return models.Users{}, errors.New("tidak dapat mengembalikan nilai")
+	}
+	return userModel, err
 }
 
 func (repository *userRepository) DeleteUser(user models.Users) (bool, error) {

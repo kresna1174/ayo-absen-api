@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"api-ayo-absen/internal/app/models"
+	"errors"
 
 	"gorm.io/gorm"
 )
@@ -44,9 +45,13 @@ func (repository *companyRepository) CreateCompany(companyEntity models.Companie
 }
 
 func (repository *companyRepository) UpdateCompany(companyEntity models.Companies) (models.Companies, error) {
-	err := repository.db.Save(&companyEntity).Error
-
-	return companyEntity, err
+	err := repository.db.Model(&companyEntity).Updates(&companyEntity).Error
+	var companyModel models.Companies
+	er := repository.db.Find(&companyModel, companyEntity.Id).Error
+	if er != nil {
+		return models.Companies{}, errors.New("tidak dapat mengembalikan nilai")
+	}
+	return companyModel, err
 }
 
 func (repository *companyRepository) DeleteCompany(companyEntitty models.Companies) (bool, error) {

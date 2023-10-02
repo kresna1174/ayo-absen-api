@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"api-ayo-absen/internal/app/models"
+
 	"gorm.io/gorm"
 )
 
@@ -42,9 +43,14 @@ func (r *companyBudgetRepository) Create(companyBudget models.CompanyBudget) (mo
 }
 
 func (r *companyBudgetRepository) Update(companyBudget models.CompanyBudget) (models.CompanyBudget, error) {
-	err := r.db.Save(&companyBudget).Error
+	err := r.db.Model(&companyBudget).Updates(&companyBudget).Error
 
-	return companyBudget, err
+	var companyBudgetModel models.CompanyBudget
+	er := r.db.Find(&companyBudgetModel, companyBudget.Id).Error
+	if er != nil {
+		return models.CompanyBudget{}, er
+	}
+	return companyBudgetModel, err
 }
 
 func (r *companyBudgetRepository) Delete(companyBudget models.CompanyBudget) (bool, error) {

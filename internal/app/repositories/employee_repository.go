@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"api-ayo-absen/internal/app/models"
+	"errors"
 
 	"gorm.io/gorm"
 )
@@ -45,9 +46,13 @@ func (repository *employeRepository) CreateEmployee(employee models.Employee) (m
 }
 
 func (repository *employeRepository) UpdateEmployee(employee models.Employee) (models.Employee, error) {
-	err := repository.db.Save(&employee).Error
-
-	return employee, err
+	err := repository.db.Model(&employee).Updates(&employee).Error
+	var employeeModel models.Employee
+	er := repository.db.Find(&employeeModel, employee.Id).Error
+	if er != nil {
+		return models.Employee{}, errors.New("tidak dapat mengembalikan nilai")
+	}
+	return employeeModel, err
 }
 
 func (repository *employeRepository) DeleteEmployee(employee models.Employee) (bool, error) {

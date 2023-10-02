@@ -1,12 +1,14 @@
 package handlers
 
 import (
+	"api-ayo-absen/internal/app/models"
 	"api-ayo-absen/internal/app/request"
 	"api-ayo-absen/internal/app/response"
 	"api-ayo-absen/internal/app/services"
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -37,6 +39,10 @@ func (h *CompanyBudgetHandler) GetAll(ctx *gin.Context) {
 			CompanyId: r.CompanyId,
 			Budget:    r.Budget,
 			Active:    r.Active,
+			CreatedAt: r.CreatedAt,
+			CreatedBy: r.CreatedBy,
+			UpdatedAt: r.UpdatedAt,
+			UpdatedBy: r.UpdatedBy,
 		}
 		resultsResponse = append(resultsResponse, resultResponse)
 	}
@@ -58,12 +64,24 @@ func (h *CompanyBudgetHandler) FindById(ctx *gin.Context) {
 			"message": "Gagal mendapatkan data",
 			"errors":  err.Error(),
 		})
+		return
+	}
+	if result.Id == 0 {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": "data tidak ditemukan",
+		})
+		return
 	}
 	resultResponse := response.CompanyBudgetResponse{
 		Id:        result.Id,
 		CompanyId: result.CompanyId,
 		Budget:    result.Budget,
 		Active:    result.Active,
+		CreatedAt: result.CreatedAt,
+		CreatedBy: result.CreatedBy,
+		UpdatedAt: result.UpdatedAt,
+		UpdatedBy: result.UpdatedBy,
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
@@ -73,7 +91,10 @@ func (h *CompanyBudgetHandler) FindById(ctx *gin.Context) {
 }
 
 func (h *CompanyBudgetHandler) Create(ctx *gin.Context) {
+	userSession := ctx.MustGet("user").(models.Users)
 	var companyBudgetRequest request.CompanyBudgetRequest
+	companyBudgetRequest.CreatedAt = time.Now()
+	companyBudgetRequest.CreatedBy = userSession.Username
 	err := ctx.ShouldBindJSON(&companyBudgetRequest)
 	if err != nil {
 		var errorMessages []string
@@ -105,6 +126,10 @@ func (h *CompanyBudgetHandler) Create(ctx *gin.Context) {
 		CompanyId: result.CompanyId,
 		Budget:    result.Budget,
 		Active:    result.Active,
+		CreatedAt: result.CreatedAt,
+		CreatedBy: result.CreatedBy,
+		UpdatedAt: result.UpdatedAt,
+		UpdatedBy: result.UpdatedBy,
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -117,7 +142,10 @@ func (h *CompanyBudgetHandler) Create(ctx *gin.Context) {
 func (h *CompanyBudgetHandler) Update(ctx *gin.Context) {
 	ids := ctx.Param("id")
 	id, _ := strconv.Atoi(ids)
-	var companyBudgetRequest request.CompanyBudgetRequest
+	userSession := ctx.MustGet("user").(models.Users)
+	var companyBudgetRequest request.CompanyBudgetUpdateRequest
+	companyBudgetRequest.UpdatedAt = time.Now()
+	companyBudgetRequest.UpdatedBy = userSession.Username
 	err := ctx.ShouldBindJSON(&companyBudgetRequest)
 	if err != nil {
 		var errorMessages []string
@@ -149,6 +177,10 @@ func (h *CompanyBudgetHandler) Update(ctx *gin.Context) {
 		CompanyId: result.CompanyId,
 		Budget:    result.Budget,
 		Active:    result.Active,
+		CreatedAt: result.CreatedAt,
+		CreatedBy: result.CreatedBy,
+		UpdatedAt: result.UpdatedAt,
+		UpdatedBy: result.UpdatedBy,
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
@@ -161,7 +193,7 @@ func (h *CompanyBudgetHandler) Update(ctx *gin.Context) {
 func (h *CompanyBudgetHandler) Delete(ctx *gin.Context) {
 	ids := ctx.Param("id")
 	id, _ := strconv.Atoi(ids)
-	result, err := h.companyBudgetServiceInterface.Delete(id)
+	_, err := h.companyBudgetServiceInterface.Delete(id)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
@@ -173,6 +205,5 @@ func (h *CompanyBudgetHandler) Delete(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "berhasil menghapus data",
-		"data":    result,
 	})
 }

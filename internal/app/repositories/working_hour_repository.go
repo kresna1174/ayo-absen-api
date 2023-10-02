@@ -2,6 +2,8 @@ package repositories
 
 import (
 	"api-ayo-absen/internal/app/models"
+	"errors"
+
 	"gorm.io/gorm"
 )
 
@@ -42,9 +44,14 @@ func (r *workingHourRepository) Create(workingHours models.WorkingHours) (models
 }
 
 func (r *workingHourRepository) Update(workingHours models.WorkingHours) (models.WorkingHours, error) {
-	err := r.db.Save(&workingHours).Error
+	err := r.db.Model(&workingHours).Updates(&workingHours).Error
 
-	return workingHours, err
+	var workingHourModel models.WorkingHours
+	er := r.db.Find(&workingHourModel, workingHours.Id).Error
+	if er != nil {
+		return models.WorkingHours{}, errors.New("tidak dapat mengembalikan nilai")
+	}
+	return workingHourModel, err
 }
 
 func (r *workingHourRepository) Delete(workingHours models.WorkingHours) (bool, error) {
