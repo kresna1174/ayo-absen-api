@@ -10,8 +10,8 @@ import (
 type EmployeeServiceInterface interface {
 	GetAll() ([]models.EmployeeWithCompany, error)
 	FindById(Id int) (models.EmployeeWithCompany, error)
-	CreateEmployee(employee request.EmployeeRequest) (models.Employee, error)
-	UpdateEmployee(Id int, employee request.EmployeeUpdateRequest) (models.Employee, error)
+	CreateEmployee(employee request.EmployeeRequest) (models.EmployeeWithCompany, error)
+	UpdateEmployee(Id int, employee request.EmployeeUpdateRequest) (models.EmployeeWithCompany, error)
 	DeleteEmployee(Id int) (bool, error)
 }
 
@@ -31,7 +31,7 @@ func (service *employeeService) FindById(Id int) (models.EmployeeWithCompany, er
 	return service.employeRepository.FindById(Id)
 }
 
-func (service *employeeService) CreateEmployee(request request.EmployeeRequest) (models.Employee, error) {
+func (service *employeeService) CreateEmployee(request request.EmployeeRequest) (models.EmployeeWithCompany, error) {
 	insertEmployee := models.Employee{
 		CompanyId: request.CompanyId,
 		Name:      request.Name,
@@ -46,10 +46,10 @@ func (service *employeeService) CreateEmployee(request request.EmployeeRequest) 
 	return service.employeRepository.CreateEmployee(insertEmployee)
 }
 
-func (service *employeeService) UpdateEmployee(Id int, request request.EmployeeUpdateRequest) (models.Employee, error) {
+func (service *employeeService) UpdateEmployee(Id int, request request.EmployeeUpdateRequest) (models.EmployeeWithCompany, error) {
 	findEmployee, err := service.employeRepository.FindById(Id)
 	if err != nil {
-		return models.Employee{}, errors.New("Data Tidak Ditemukan")
+		return models.EmployeeWithCompany{}, errors.New("Data Tidak Ditemukan")
 	}
 
 	updateEmployee := models.Employee{

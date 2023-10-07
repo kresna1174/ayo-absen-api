@@ -124,23 +124,23 @@ func (handler *EmployeeHandler) CreateEmployee(ctx *gin.Context) {
 		return
 	}
 
-	employeeResponse := response.EmployeeResponse{
-		Id:        result.Id,
-		CompanyId: result.CompanyId,
-		Name:      result.Name,
-		Start:     result.Start,
-		End:       result.End,
-		Active:    result.Active,
-		CreatedAt: result.CreatedAt,
-		CreatedBy: result.CreatedBy,
-		UpdatedAt: result.UpdatedAt,
-		UpdatedBy: result.UpdatedBy,
-	}
+	// employeeResponse := response.EmployeeResponse{
+	// 	Id:        result.Id,
+	// 	CompanyId: result.CompanyId,
+	// 	Name:      result.Name,
+	// 	Start:     result.Start,
+	// 	End:       result.End,
+	// 	Active:    result.Active,
+	// 	CreatedAt: result.CreatedAt,
+	// 	CreatedBy: result.CreatedBy,
+	// 	UpdatedAt: result.UpdatedAt,
+	// 	UpdatedBy: result.UpdatedBy,
+	// }
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "berhasil menambahkan data",
-		"data":    employeeResponse,
+		"data":    result,
 	})
 }
 
@@ -177,23 +177,23 @@ func (handler *EmployeeHandler) UpdateEmployee(ctx *gin.Context) {
 		return
 	}
 
-	employeeResponse := response.EmployeeResponse{
-		Id:        result.Id,
-		CompanyId: result.CompanyId,
-		Name:      result.Name,
-		Start:     result.Start,
-		End:       result.End,
-		Active:    result.Active,
-		CreatedAt: result.CreatedAt,
-		CreatedBy: result.CreatedBy,
-		UpdatedAt: result.UpdatedAt,
-		UpdatedBy: result.UpdatedBy,
-	}
+	// employeeResponse := response.EmployeeResponse{
+	// 	Id:        result.Id,
+	// 	CompanyId: result.CompanyId,
+	// 	Name:      result.Name,
+	// 	Start:     result.Start,
+	// 	End:       result.End,
+	// 	Active:    result.Active,
+	// 	CreatedAt: result.CreatedAt,
+	// 	CreatedBy: result.CreatedBy,
+	// 	UpdatedAt: result.UpdatedAt,
+	// 	UpdatedBy: result.UpdatedBy,
+	// }
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "berhasil mengupdate data",
-		"data":    employeeResponse,
+		"data":    result,
 	})
 }
 

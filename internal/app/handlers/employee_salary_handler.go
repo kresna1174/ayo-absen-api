@@ -53,7 +53,7 @@ func (handler *EmployeeSalaryHandler) GetAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "berhasil mendapatkan data",
-		"data":    employeeSalaryResponses,
+		"data":    response,
 	})
 }
 

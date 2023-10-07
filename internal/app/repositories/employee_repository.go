@@ -10,8 +10,8 @@ import (
 type EmployeeRepositoryInterafce interface {
 	GetAll() ([]models.EmployeeWithCompany, error)
 	FindById(Id int) (models.EmployeeWithCompany, error)
-	CreateEmployee(employee models.Employee) (models.Employee, error)
-	UpdateEmployee(employee models.Employee) (models.Employee, error)
+	CreateEmployee(employee models.Employee) (models.EmployeeWithCompany, error)
+	UpdateEmployee(employee models.Employee) (models.EmployeeWithCompany, error)
 	DeleteEmployee(employee models.EmployeeWithCompany) (bool, error)
 }
 
@@ -38,20 +38,24 @@ func (repository *employeRepository) FindById(Id int) (models.EmployeeWithCompan
 	// return employee, err
 }
 
-func (repository *employeRepository) CreateEmployee(employee models.Employee) (models.Employee, error) {
+func (repository *employeRepository) CreateEmployee(employee models.Employee) (models.EmployeeWithCompany, error) {
 	err := repository.db.Create(&employee).Error
 
-	return employee, err
+	result, er := employee.ViewCompanySinggle(repository.db, employee.Id)
+	if er != nil {
+		return models.EmployeeWithCompany{}, errors.New("tidak dapat mengembalikan nilai")
+	}
+
+	return result, err
 }
 
-func (repository *employeRepository) UpdateEmployee(employee models.Employee) (models.Employee, error) {
+func (repository *employeRepository) UpdateEmployee(employee models.Employee) (models.EmployeeWithCompany, error) {
 	err := repository.db.Model(&employee).Updates(&employee).Error
-	var employeeModel models.Employee
-	er := repository.db.Find(&employeeModel, employee.Id).Error
+	result, er := employee.ViewCompanySinggle(repository.db, employee.Id)
 	if er != nil {
-		return models.Employee{}, errors.New("tidak dapat mengembalikan nilai")
+		return models.EmployeeWithCompany{}, errors.New("tidak dapat mengembalikan nilai")
 	}
-	return employeeModel, err
+	return result, err
 }
 
 func (repository *employeRepository) DeleteEmployee(employee models.EmployeeWithCompany) (bool, error) {

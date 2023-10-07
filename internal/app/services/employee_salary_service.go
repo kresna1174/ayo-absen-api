@@ -8,7 +8,7 @@ import (
 )
 
 type EmployeeSalaryServiceInterface interface {
-	GetAll() ([]models.EmployeeSalaries, error)
+	GetAll() ([]models.EmployeeSalaryWithEmployeeAndCompany, error)
 	FindById(Id int) (models.EmployeeSalaries, error)
 	Create(employeeSalary request.EmployeeSalaryRequest) (models.EmployeeSalaries, error)
 	Update(Id int, employeeSalary request.EmployeeSalaryUpdateRequest) (models.EmployeeSalaries, error)
@@ -23,7 +23,7 @@ func NewEmployeeSalaryService(employeeSalaryRepositoryInterface repositories.Emp
 	return &employeeSalaryService{employeeSalaryRepositoryInterface}
 }
 
-func (service *employeeSalaryService) GetAll() ([]models.EmployeeSalaries, error) {
+func (service *employeeSalaryService) GetAll() ([]models.EmployeeSalaryWithEmployeeAndCompany, error) {
 	return service.employeeRepositoryInterface.GetAll()
 }
 

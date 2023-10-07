@@ -8,7 +8,7 @@ import (
 )
 
 type EmployeeSalaryRepositoryInterface interface {
-	GetAll() ([]models.EmployeeSalaries, error)
+	GetAll() ([]models.EmployeeSalaryWithEmployeeAndCompany, error)
 	FindById(Id int) (models.EmployeeSalaries, error)
 	Create(company models.EmployeeSalaries) (models.EmployeeSalaries, error)
 	Update(company models.EmployeeSalaries) (models.EmployeeSalaries, error)
@@ -23,13 +23,13 @@ func NewEmployeeSalaryRepository(db *gorm.DB) *employeeSalaryRepository {
 	return &employeeSalaryRepository{db}
 }
 
-func (r *employeeSalaryRepository) GetAll() ([]models.EmployeeSalaries, error) {
-	var employeeSalaryEntity []models.EmployeeSalaries
-	err := r.db.Find(&employeeSalaryEntity).Error
-	if err != nil {
-		return []models.EmployeeSalaries{}, err
-	}
-	return employeeSalaryEntity, err
+func (r *employeeSalaryRepository) GetAll() ([]models.EmployeeSalaryWithEmployeeAndCompany, error) {
+	var employeeSalaryEntity models.EmployeeSalaries
+	return employeeSalaryEntity.GetRelation(r.db)
+	// err := r.db.Find(&employeeSalaryEntity).Error
+	// if err != nil {
+	// 	return []models.EmployeeSalaryWithEmployeeAndCompany{}, err
+	// }
 }
 
 func (r *employeeSalaryRepository) FindById(Id int) (models.EmployeeSalaries, error) {
